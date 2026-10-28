@@ -5,7 +5,7 @@ from qwen_lora.data import collate_batch, encode_conversation, split_conversatio
 
 class FakeTokenizer:
     def apply_chat_template(self, messages, tokenize=True, add_generation_prompt=False):
-        # ����ģ��ģ��ǰ׺��ල�߽磬����������ʵȨ�ء�
+        # 测试模型模板前缀与监督边界，无需下载真实权重。
         tokens = [1]
         for message in messages:
             tokens += [2 if message["role"] == "user" else 3, len(message["content"]), 4]
@@ -41,9 +41,9 @@ def test_encode_rejects_template_mismatch_and_overlength():
             return [1, 2] if add_generation_prompt else [3, 4, 5]
 
     item = [{"role": "user", "content": "a"}, {"role": "assistant", "content": "b"}]
-    with pytest.raises(ValueError, match="��һ��"):
+    with pytest.raises(ValueError, match="不一致"):
         encode_conversation(item, BadTokenizer(), 10)
-    with pytest.raises(ValueError, match="����"):
+    with pytest.raises(ValueError, match="超过"):
         encode_conversation(item, BadTokenizer(), 2)
 
 

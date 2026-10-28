@@ -1,10 +1,10 @@
-{"messages":[{"role":"user","content":"����һ�仰����ʲô�ǹ���ϡ�"},{"role":"assistant","content":"�������ģ�ͼ�סѵ�������е�ϸ�ں��������������������ϱ��ֱ�"}]}
-{"messages":[{"role":"user","content":"ʲô���ݶ��½���"},{"role":"assistant","content":"�ݶ��½���һ������ʧ�������ݶȷ�����²����Խ�����ʧ���Ż�������"}]}
-{"messages":[{"role":"user","content":"2 �� 3 ���ڶ��٣�"},{"role":"assistant","content":"2 �� 3 ���� 5��"}]}
-{"messages":[{"role":"user","content":"�뽫 cat ��������ġ�"},{"role":"assistant","content":"cat �������ǡ�è����"}]}
-{"messages":[{"role":"user","content":"�����ע�������ơ�"},{"role":"assistant","content":"ע�������Ƹ��������Ϊ����Ĳ�ͬλ�÷���Ȩ�أ��ٻ�����Ϣ��"}]}
-{"messages":[{"role":"user","content":"ʲô����֤����"},{"role":"assistant","content":"��֤����ѵ������������ѡ��ģ�ͺ͵�������������������������µ����ݡ�"}]}
-{"messages":[{"role":"user","content":"�����һ��ż����"},{"role":"assistant","content":"4 ��ż����"}]}
-{"messages":[{"role":"user","content":"ʲô�� LoRA��"},{"role":"assistant","content":"LoRA ʹ�õ��Ⱦ������Ȩ�ظ��£�ֻѵ����������������"}]}
-{"messages":[{"role":"user","content":"���ܽ��Ͳ�����Ч΢����"},{"role":"assistant","content":"������Ч΢��ֻ����ģ�͵�һС���ֲ������Խ���ѵ���ɱ���"}]}
-{"messages":[{"role":"user","content":"ʲô������ģ�ͣ�"},{"role":"assistant","content":"����ģ��ѧϰ�ı���ͳ�ƹ��ɣ�����Ԥ������ɺ������ݡ�"}]}
+{"messages":[{"role":"user","content":"请用一句话解释什么是过拟合。"},{"role":"assistant","content":"过拟合是模型记住训练数据中的细节和噪声，导致在新数据上表现变差。"}]}
+{"messages":[{"role":"user","content":"什么是梯度下降？"},{"role":"assistant","content":"梯度下降是一种沿损失函数负梯度方向更新参数以降低损失的优化方法。"}]}
+{"messages":[{"role":"user","content":"2 加 3 等于多少？"},{"role":"assistant","content":"2 加 3 等于 5。"}]}
+{"messages":[{"role":"user","content":"请将 cat 翻译成中文。"},{"role":"assistant","content":"cat 的中文是“猫”。"}]}
+{"messages":[{"role":"user","content":"请简述注意力机制。"},{"role":"assistant","content":"注意力机制根据相关性为输入的不同位置分配权重，再汇总信息。"}]}
+{"messages":[{"role":"user","content":"什么是验证集？"},{"role":"assistant","content":"验证集是训练过程中用于选择模型和调整超参数、但不参与参数更新的数据。"}]}
+{"messages":[{"role":"user","content":"请给出一个偶数。"},{"role":"assistant","content":"4 是偶数。"}]}
+{"messages":[{"role":"user","content":"什么是 LoRA？"},{"role":"assistant","content":"LoRA 使用低秩矩阵近似权重更新，只训练少量新增参数。"}]}
+{"messages":[{"role":"user","content":"你能解释参数高效微调吗？"},{"role":"assistant","content":"参数高效微调只更新模型的一小部分参数，以降低训练成本。"}]}
+{"messages":[{"role":"user","content":"什么是语言模型？"},{"role":"assistant","content":"语言模型学习文本的统计规律，用来预测或生成后续内容。"}]}

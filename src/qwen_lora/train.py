@@ -1,4 +1,4 @@
-"""Qwen3-0.6B Base �� LoRA �ල΢����ڡ�"""
+"""Qwen3-0.6B Base 的 LoRA 监督微调入口。"""
 
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ class EncodedDataset(Dataset):
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--model", default="Qwen/Qwen3-0.6B-Base")
-    p.add_argument("--revision", default="main", help="ģ�Ͳֿ� revision������ʹ�þ��� commit SHA")
+    p.add_argument("--revision", default="main", help="模型仓库 revision；建议使用具体 commit SHA")
     p.add_argument("--data", type=Path, default=Path("examples/toy_conversations.jsonl"))
     p.add_argument("--output", type=Path, default=Path("outputs/demo"))
     p.add_argument("--max-length", type=int, default=256)
@@ -49,7 +49,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--gradient-accumulation", type=int, default=4)
     p.add_argument("--max-steps", type=int, default=20)
     p.add_argument("--eval-steps", type=int, default=5)
-    p.add_argument("--quantize-4bit", action="store_true", help="��ѡ���谲װ .[quant]���� CUDA")
+    p.add_argument("--quantize-4bit", action="store_true", help="可选；需安装 .[quant]，仅 CUDA")
     return p
 
 
@@ -58,11 +58,11 @@ def run(args: argparse.Namespace) -> Path:
     from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
 
     if args.rank < 1 or args.alpha < 1 or not 0 <= args.dropout < 1:
-        raise ValueError("rank/alpha ����Ϊ������dropout ������ [0, 1) ��")
+        raise ValueError("rank/alpha 必须为正数，dropout 必须在 [0, 1) 内")
     if args.batch_size < 1 or args.gradient_accumulation < 1 or args.max_steps < 1 or args.eval_steps < 1:
-        raise ValueError("batch-size��gradient-accumulation��max-steps��eval-steps ����Ϊ����")
+        raise ValueError("batch-size、gradient-accumulation、max-steps、eval-steps 必须为正数")
     if args.quantize_4bit and not torch.cuda.is_available():
-        raise RuntimeError("4bit ����Ŀǰ�������� CUDA �豸������")
+        raise RuntimeError("4bit 量化目前仅允许在 CUDA 设备上运行")
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     random.seed(args.seed)
@@ -83,11 +83,11 @@ def run(args: argparse.Namespace) -> Path:
             try:
                 encoded.append(encode_conversation(messages, tokenizer, args.max_length))
             except ValueError as exc:
-                if "���� max_length" not in str(exc):
+                if "超过 max_length" not in str(exc):
                     raise
                 skipped[split_name] += 1
         if not encoded:
-            raise ValueError(f"{split_name} ��û�п�ѵ�������������� --max-length ��������")
+            raise ValueError(f"{split_name} 集没有可训练样本；请增大 --max-length 或检查数据")
         return encoded
 
     train_data = EncodedDataset(encode_all(train_raw, "train"))
@@ -103,7 +103,7 @@ def run(args: argparse.Namespace) -> Path:
     found = {name.rsplit(".", 1)[-1] for name, _ in model.named_modules()}
     absent = set(TARGET_MODULES) - found
     if absent:
-        raise RuntimeError(f"ģ��ȱ�� LoRA Ŀ��ģ��: {sorted(absent)}")
+        raise RuntimeError(f"模型缺少 LoRA 目标模块: {sorted(absent)}")
     if args.quantize_4bit:
         model = prepare_model_for_kbit_training(model)
     model.config.use_cache = False
@@ -111,7 +111,7 @@ def run(args: argparse.Namespace) -> Path:
         task_type=TaskType.CAUSAL_LM, r=args.rank, lora_alpha=args.alpha,
         lora_dropout=args.dropout, target_modules=list(TARGET_MODULES), bias="none",
     ))
-    # �ݶȼ�����������ʱ�豣�� embedding ������ݶ�ͨ·��
+    # 梯度检查点重算输入时需保留 embedding 输出的梯度通路。
     model.enable_input_require_grads()
     total = sum(p.numel() for p in model.parameters())
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)

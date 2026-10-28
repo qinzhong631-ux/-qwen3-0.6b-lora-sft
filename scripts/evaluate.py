@@ -1,4 +1,4 @@
-"""����ͬ���÷ֱ����л����� LoRA adapter �ı�׼��׼��"""
+"""以相同配置分别运行基座和 LoRA adapter 的标准基准。"""
 
 import argparse
 import json
@@ -12,9 +12,9 @@ TASK_SHOTS = {"mmlu": 5, "gsm8k": 5, "ifeval": 0}
 
 def build_command(model: str, task: str, output: Path, adapter: str | None = None,
                   batch_size: int = 1, revision: str | None = None) -> list[str]:
-    """���������ã����� IFEval �� few-shot ��׼������ͬ shot ����"""
+    """单任务单配置，避免 IFEval 与 few-shot 基准混用相同 shot 数。"""
     if task not in TASK_SHOTS or batch_size < 1:
-        raise ValueError("����� batch_size ��Ч")
+        raise ValueError("任务或 batch_size 无效")
     model_args = f"pretrained={model}"
     if revision:
         model_args += f",revision={revision}"
@@ -34,10 +34,10 @@ def main() -> None:
     p.add_argument("--output", type=Path, default=Path("outputs/evaluation"))
     p.add_argument("--batch-size", type=int, default=1)
     p.add_argument("--tasks", nargs="+", choices=list(TASK_SHOTS), default=list(TASK_SHOTS))
-    p.add_argument("--dry-run", action="store_true", help="ֻ��ӡ�����ִ�л�׼")
+    p.add_argument("--dry-run", action="store_true", help="只打印命令，不执行基准")
     args = p.parse_args()
     if not args.adapter.exists() and not args.dry_run:
-        p.error(f"adapter �����ڣ�{args.adapter}")
+        p.error(f"adapter 不存在：{args.adapter}")
     args.output.mkdir(parents=True, exist_ok=True)
     runs = []
     for task in args.tasks:

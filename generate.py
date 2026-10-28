@@ -1,4 +1,4 @@
-"""���ػ����򱾵� LoRA adapter������һ���ظ���"""
+"""加载基座或本地 LoRA adapter，生成一条回复。"""
 
 import argparse
 
@@ -17,7 +17,7 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=42)
     args = p.parse_args()
     if args.max_new_tokens < 1 or args.temperature <= 0:
-        p.error("max-new-tokens �� temperature ����Ϊ����")
+        p.error("max-new-tokens 和 temperature 必须为正数")
     torch.manual_seed(args.seed)
     dtype = (torch.bfloat16 if torch.cuda.is_bf16_supported() else torch.float16) if torch.cuda.is_available() else torch.float32
     tokenizer = AutoTokenizer.from_pretrained(args.adapter or args.model, revision=args.revision if not args.adapter else None)
