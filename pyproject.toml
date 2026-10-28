@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qwen3-0.6b-lora-sft-lab"
+version = "0.1.0"
+description = "Auditable Qwen3-0.6B Base LoRA SFT and evaluation workflow"
+requires-python = ">=3.10"
+license = "MIT"
+readme = "README.md"
+authors = [{name = "qinzhong631-ux"}]
+dependencies = [
+  "torch>=2.7,<3",
+  "transformers>=4.51,<5",
+  "peft>=0.15,<1",
+  "accelerate>=1.5,<2",
+  "safetensors>=0.5,<1",
+]
+
+[project.optional-dependencies]
+eval = ["lm-eval[hf]>=0.4.13,<0.5"]
+quant = ["bitsandbytes>=0.45,<1"]
+test = ["pytest>=8,<10"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
