@@ -71,6 +71,17 @@ python -m pip install -e '.[test]'  # 仅运行单元测试时需要
 
 脚本使用模型自带的 Chat Template，并检查提示前缀是否与完整对话一致。仅最后一条助手回复及其结束标记参与损失计算；历史消息、用户消息和 padding 的标签为 `-100`。同一输入对话的不同答案被分在同一个数据集侧，以降低泄漏风险。请在真实研究前核查数据来源、许可证、隐私信息及与评测基准的重叠。
 
+### 公开数据准备
+
+项目使用 [UltraChat 200k](https://huggingface.co/datasets/HuggingFaceH4/ultrachat_200k) 的 `train_sft` 分区作为首个正式训练数据源；数据卡标注 MIT 许可。以下命令通过 Hugging Face 官方 [Dataset Viewer `/rows` 接口](https://huggingface.co/docs/dataset-viewer/rows) 按固定随机种子抽取 3,000 条来源记录，优先选前两轮完整问答，超长时退回首轮；每条原始对话最多形成一条训练样本：
+
+```bash
+python scripts/prepare_ultrachat.py --source-rows 3000 --max-length 512 --seed 42 \
+  --output data/ultrachat_sft_clean.jsonl
+```
+
+2026-10-29 的一次实际数据准备得到 1,703 条有效样本（660 条保留多轮上下文），1,297 条因超长、格式或联系方式样式被过滤；生成的 JSONL SHA-256 为 `4b233c8815bfa6ac1116cee546ced2014f3a89a08f622682c1a746684c2ef987`。下载时数据集 revision 为 `8049631c405ae6576f93f445c6b8166f76f5505a`。邮箱和电话号码正则过滤只是保守筛查，不能保证完全去除个人信息。`/rows` 接口不能锁定 revision，因此若上游数据变化，重新抽样可能不同；本地 `data/ultrachat_sft_clean.manifest.json` 记录实际偏移和哈希。数据文件不上传到本仓库。
+
 ## 运行
 
 ```bash
@@ -80,6 +91,12 @@ python train.py --data examples/toy_conversations.jsonl --output outputs/demo
 # 真实实验：替换为有许可且经清洗的 JSONL
 python train.py --data data/train.jsonl --output outputs/experiment-01 \
   --rank 8 --alpha 16 --dropout 0.05 --seed 42 --max-steps 200
+
+# 使用上面准备的 UltraChat 数据和固定模型 revision
+python train.py --data data/ultrachat_sft_clean.jsonl --output outputs/ultrachat-main \
+  --revision da87bfb608c14b7cf20ba1ce41287e8de496c0cd \
+  --max-length 512 --batch-size 1 --gradient-accumulation 4 \
+  --max-steps 200 --eval-steps 20
 
 # 生成
 python generate.py --adapter outputs/demo/adapter --prompt "请解释 LoRA。"
